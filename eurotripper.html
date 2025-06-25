@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>Карта Вены и Будапешта + Моя позиция</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>#map { height: 95vh; }</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([48.21, 16.36], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Геолокация пользователя
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+
+        const userMarker = L.marker([lat, lon]).addTo(map);
+        userMarker.bindPopup("Вы здесь").openPopup();
+
+        // Круг точности
+        L.circle([lat, lon], {
+          radius: accuracy,
+          color: "blue",
+          fillColor: "#add8e6",
+          fillOpacity: 0.3
+        }).addTo(map);
+
+        map.setView([lat, lon], 14);
+      },
+      () => {
+        alert("Не удалось получить ваше местоположение.");
+      }
+    );
+  } else {
+    alert("Геолокация не поддерживается вашим браузером.");
+  }
+
+  const places = [
+    {name: "Венская ратуша", coords: [48.21066, 16.35701], comment: "Friedrich‑Schmidt‑Platz 1, 1010 Wien"},
+    {name: "Венская опера", coords: [48.20278, 16.36847], comment: "Opernring 2, 1010 Wien"},
+    {name: "Дом Хундертвассера", coords: [48.20722, 16.39417], comment: "Kegelgasse 36–38, 1030 Wien"},
+    {name: "Дом бабочек", coords: [48.20498, 16.36697], comment: "Burggarten – Schmetterlinghaus"},
+    {name: "UNO City", coords: [48.23472, 16.41694], comment: "Wagramer Str 5, современный квартал"},
+    {name: "Район Шпиттельберг", coords: [48.20330, 16.35750], comment: "1070 Vienna, сувениры"},
+    {name: "венский лес", coords: [48.09956, 16.21542], comment: "Stift Heiligenkreuz, Wienerwald"},
+    {name: "Stephansplatz", coords: [48.20832, 16.37306], comment: "Stephansplatz, Центральная площадь с собором"},
+    {name: "Karlsplatz", coords: [48.19953, 16.36515], comment: "Karlsplatz, с Карлскирхе и музеями"},
+    {name: "Schönbrunn", coords: [48.18436, 16.30286], comment: "Schönbrunner Schloßstraße 47, дворец и парк"},
+    {name: "Belvedere", coords: [48.19111, 16.38089], comment: "Prinz Eugen‑Straße 27, дворцовый комплекс"},
+    {name: "Hofburg", coords: [48.20553, 16.36476], comment: "Michaelerkuppel, резиденция Габсбургов"},
+    {name: "Prater", coords: [48.21639, 16.39857], comment: "Prater, парк с историческим колесом обозрения"},
+    {name: "Naschmarkt", coords: [48.19897, 16.36105], comment: "Naschmarkt, рынок уличной еды и антиквариата"},
+    {name: "Votivkirche", coords: [48.21557, 16.35908], comment: "Rooseveltplatz, неоготическая церковь"},
+    {name: "Café der Provinz", coords: [48.21050, 16.20350], comment: "Maria‑Treu‑Gasse 3, французско‑венское кафе"},
+    {name: "Schikaneder", coords: [48.20000, 16.36400], comment: "Margaretenstraße 22‑24, артхаус‑кинотеатр и бар"},
+    {name: "Wirr", coords: [48.20400, 16.35700], comment: "Burggasse 70, модное кафе‑бар"},
+    {name: "fania bar", coords: [48.20800, 16.35750], comment: "Zieglergasse 36, уютный винный бар"},
+    {name: "newbar", coords: [48.20900, 16.35900], comment: "Neustiftgasse 23, авторские коктейли"},
+    {name: "WerkzeugH", coords: [48.19700, 16.33300], comment: "Schönbrunner Str. 61, бар в индустриальном стиле"},
+    {name: "Atlas", coords: [48.19750, 16.35450], comment: "Rechte Wienzeile 9, кафе‑бар восточной кухни"},
+    {name: "ototo", coords: [48.19900, 16.35350], comment: "Operngasse 7, японский коктейль‑бар"},
+    {name: "Café Morgenstern", coords: [48.23400, 16.33100], comment: "Sandleitengasse 38, спокойное кафе с выпечкой"},
+    {name: "Liebling", coords: [48.20500, 16.35700], comment: "Zollergasse 6, хипстерский бар‑кафе с DJ‑сетами"},
+    {name: "Tredici e Mezzo", coords: [48.19850, 16.35900], comment: "Schmalzhofgasse 11, итальянский бар с винами"},
+    {name: "phil", coords: [48.19750, 16.35400], comment: "Gumpendorfer Str. 10‑12, книжное кафе с винилом"},
+    {name: "Café Clash", coords: [48.19600, 16.32700], comment: "Reindorfgasse 19, недорогой бар с двориком"},
+    {name: "Rakete", coords: [48.20950, 16.37250], comment: "Wipplingerstraße 23, минималистичный коктейль‑бар"},
+    {name: "Zimmer37", coords: [48.19700, 16.33300], comment: "Schönbrunner Str. 37, лофт‑бар с танцами"},
+    {name: "Café Prückel", coords: [48.20525, 16.37375], comment: "Stubenring 24, историческое кафе 50‑х"},
+    {name: "Donaukanal", coords: [48.21350, 16.38350], comment: "Donaukanal – набережная с граффити"},
+    {name: "Donauinsel", coords: [48.22300, 16.39900], comment: "Donauinsel – остров Дуная, отдых и спорт"},
+    {name: "Alte Donau", coords: [48.21900, 16.40600], comment: "Alte Donau – старое русло для купания"},
+    {name: "Nußberg", coords: [48.26000, 16.37900], comment: "Kahlenberger Str., виноградники с панорамным видом"},
+    {name: "Cobenzl", coords: [48.26300, 16.39400], comment: "Am Cobenzl 96a, зона отдыха с винодельнями"},
+    {name: "Kahlenberg", coords: [48.26100, 16.39200], comment: "Höhenstraße 125, обзорная точка Вены"},
+    {name: "Lobau", coords: [48.18000, 16.50000], comment: "Lobau, часть национального парка"},
+    {name: "Türkenschanzpark", coords: [48.22350, 16.35200], comment: "Исторический парк с павильонами"},
+    {name: "Wasserpark", coords: [48.22400, 16.40600], comment: "Парк с каналами и мостиками"},
+    {name: "Lainzer Tiergarten", coords: [48.18050, 16.26600], comment: "Hermesstraße 1, природный заповедник"},
+    {name: "Wienerberg", coords: [48.16800, 16.36800], comment: "Wienerberg, озеро и веломаршруты"},
+    {name: "Bisamberg", coords: [48.30600, 16.35900], comment: "Bisamberg, холм с виноградниками"},
+    {name: "K22 Smart Rooms", coords: [48.21500, 16.33300], comment: "Kulmgasse 22, 1170 Wien – ваш отель"},
+    {name: "Рыбацкий бастион", coords: [47.5027, 19.0344], comment: "Szentháromság tér, 1014 Budapest"} ,
+    {name: "Фуникулёр на Замковую гору", coords: [47.49835, 19.04046], comment: "Clark Ádám tér, 1013 Budapest"} ,
+    {name: "Королевский дворец", coords: [47.49617, 19.03957], comment: "Szent György tér 2, 1014 Budapest"} ,
+    {name: "Цепной мост", coords: [47.49889, 19.04361], comment: "Széchenyi Lánchíd, Budapest"} ,
+    {name: "Прогулка по Дунаю", coords: [47.4997, 19.0480], comment: "Pier at Vigadó tér или Batthyány tér"} ,
+    {name: "Остров Маргит", coords: [47.52639, 19.04722], comment: "Margaret Island, Budapest"} ,
+    {name: "Парламент Венгрии", coords: [47.5076, 19.0450], comment: "Kossuth Lajos tér 1–3, 1055 Budapest"} ,
+    {name: "Музей светового искусства", coords: [47.4980, 19.0610], comment: "Hold utca 13, 1054 Budapest"} ,
+    {name: "Цитадель", coords: [47.5121, 19.0307], comment: "Citadella sétány, 1118 Budapest"} ,
+    {name: "Ferry Wheel", coords: [47.4985, 19.0480], comment: "Erzsébet tér, 1051 Budapest"} ,
+    {name: "Great Market Hall", coords: [47.4811, 19.0590], comment: "Vámház krt 1–3, 1093 Budapest"} ,
+    {name: "Vajdahunyad Castle", coords: [47.5219, 19.0495], comment: "Vajdahunyad vára, 1146 Budapest"} ,
+    {name: "Hero Square", coords: [47.5143, 19.0775], comment: "Hősök tere, 1146 Budapest"} ,
+    {name: "Zërgë Coffeeshop", coords: [47.4925, 19.0600], comment: "Madách Imre út 5, 1075 Budapest"} ,
+    {name: "Partisan Coffee Shop", coords: [47.4927, 19.0612], comment: "Károly krt 1, 1075 Budapest"} ,
+    {name: "Cookie Beacon Brunch", coords: [47.4928, 19.0613], comment: "Károly krt 3/A, 1075 Budapest"} ,
+    {name: "Best Bagel Basilica", coords: [47.5003, 19.0532], comment: "Bajcsy‑Zsilinszky út 15, 1065 Budapest"} ,
+    {name: "Cafe Brunch Budapest Bazilika", coords: [47.5002, 19.0514], comment: "Hercegprímás u. 12, 1051 Budapest"} ,
+    {name: "Gelateria Pichler", coords: [47.4928, 19.0613], comment: "Károly krt 3/A, 1075 Budapest"} ,
+    {name: "Cafe Brunch Fővám tér", coords: [47.4811, 19.0590], comment: "Fővám tér 4, 1056 Budapest"} ,
+    {name: "Leo Rooftop Bar", coords: [47.49835, 19.04046], comment: "Clark Ádám tér 1, 1013 Budapest"} ,
+    {name: "High Note SkyBar", coords: [47.5002, 19.0505], comment: "Hercegprímás u. 5, 1051 Budapest"} ,
+    {name: "Szimpla Kert", coords: [47.4970, 19.0634], comment: "Kazinczy u. 14, 1075 Budapest"} ,
+    {name: "Наш отель (Ferenc körút)", coords: [47.4979, 19.060], comment: "1092 Budapest, 8 Ferenc körút, ваш отель"}
+  ];
+
+  places.forEach(p => {
+    L.marker(p.coords).addTo(map)
+      .bindPopup(`<b>${p.name}</b><br>${p.comment}`);
+  });
+</script>
+</body>
+</html>
